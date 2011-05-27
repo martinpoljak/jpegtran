@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+# encoding: utf-8
+
+$:.push("./lib")
+require "jpegtran"
+require "em-pipe-run"
+
+EM::run do
+    puts Jpegtran.available?.inspect
+    Jpegtran.optimize("./test.jpg", { :optimize => true, :progressive => true, :debug => true }) do |results|
+        puts results.inspect
+    end
+    
+    puts "after"
+end
