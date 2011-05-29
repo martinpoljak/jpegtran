@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{jpegtran}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Martin Kozák}]
-  s.date = %q{2011-05-27}
+  s.date = %q{2011-05-29}
   s.email = %q{martinkozak@martinkozak.net}
   s.extra_rdoc_files = [
     "LICENSE.txt",
@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{https://github.com/martinkozak/jpegtran}
   s.licenses = [%q{MIT}]
   s.require_paths = [%q{lib}]
-  s.rubygems_version = %q{1.8.3}
+  s.rubygems_version = %q{1.8.4}
   s.summary = %q{Ruby interface to 'jpegtran' tool.}
 
   if s.respond_to? :specification_version then
