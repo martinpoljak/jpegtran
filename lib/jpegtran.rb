@@ -1,11 +1,10 @@
 # encoding: utf-8
 # (c) 2011 Martin Kozák (martinkozak@martinkozak.net)
 
-require "command-builder"
-require "pipe-run"
+require "command-builder"     # >= 0.2.0
 require "unix/whereis"
 require "lookup-hash"
-require "hash-utils/object"   # >= 0.15.0
+require "hash-utils/object"   # >= 0.18.0
 
 ##
 # The +jpegtran+ tool command frontend.
@@ -90,7 +89,7 @@ module Jpegtran
         
         # Turn on/off arguments
         options.each_pair do |k, v|
-            if v.true? and self::BOOLEAN_ARGS.has_key? k
+            if v.true? and k.in? self::BOOLEAN_ARGS
                 cmd << k
             end
         end
@@ -98,35 +97,35 @@ module Jpegtran
         # Rotate
         if options[:rotate].kind_of? Integer
             cmd.arg(:rotate, options[:rotate].to_i)
-        elsif options.has_key? :rotate
+        elsif :rotate.in? options
             raise Exception::new("Invalid value for :rotate option. Integer expected.")
         end
         
         # Rotate
         if options[:restart].kind_of? Integer
             cmd.arg(:restart, options[:restart].to_i)
-        elsif options.has_key? :restart
+        elsif :restart.in? options
             raise Exception::new("Invalid value for :restart option. Integer expected.")
         end
         
         # Crop
-        if options[:crop].kind_of? String
+        if options[:crop].string?
             cmd.arg(:crop, options[:crop].to_s)
-        elsif options.has_key? :crop
+        elsif :crop.in? options
             raise Exception::new("Invalid value for :crop option. Structured string expected. See 'jpegtran' reference.")
         end
         
         # Scans
-        if options[:scans].kind_of? String
+        if options[:scans].string?
             cmd.arg(:scans, options[:scans].to_s)
-        elsif options.has_key? :scans
+        elsif :scans.in? options
             raise Exception::new("Invalid value for :scans option. String expected.")
         end
                 
         # Copy
-        if options.has_key? :copy 
+        if :copy.in? options 
             value = options[:copy].to_sym
-            if self::COPY_OPTIONS.has_key? value
+            if vlaue.in? self::COPY_OPTIONS
                 cmd.arg(:copy, value)
             else
                 raise Exception::new("Invalid value for :copy. Expected " << self::COPY_OPTIONS.to_s)
@@ -134,9 +133,9 @@ module Jpegtran
         end 
         
         # Flip
-        if options.has_key? :flip
+        if :flip.in? options
             value = options[:flip].to_sym
-            if self::FLIP_OPTIONS.has_key? value
+            if value.in? self::FLIP_OPTIONS
                 cmd.arg(:flip, value)
             else
                 raise Exception::new("Invalid value for :flip. Expected " << self::FLIP_OPTIONS.to_s)
@@ -144,8 +143,8 @@ module Jpegtran
         end
         
         # Outfile
-        if options.has_key? :outfile
-            if options[:outfile].kind_of? String
+        if :outfile.in? options
+            if options[:outfile].string?
                 value = options[:outfile].to_s
             else
                 raise Exception::new("Invalid value for :outfile option. String expected.")
@@ -163,22 +162,13 @@ module Jpegtran
             STDERR.write cmd.to_s + "\n"
         end
             
-        cmd = cmd.to_s
-        
         # Blocking
         if block.nil?
-            #output = Pipe.run(cmd)
-            Pipe.run(cmd)
+            cmd.execute!
 
-            # Parses output
-            #errors = __parse_output(output)
-            #return self::Result::new(errors)
-            
         # Non-blocking
         else
-            Pipe.run(cmd) do #|output|
-     #           errors = __parse_output(output)
-     #           block.call(self::Result::new(errors))
+            cmd.execute do |output|
                 block.call()
             end
         end
