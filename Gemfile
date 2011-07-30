@@ -2,7 +2,7 @@ source "http://rubygems.org"
 # Add dependencies required to use your gem here.
 # Example:
    gem "hash-utils", ">= 0.18.0"
-   gem "command-builder", ">= 0.1.0"
+   gem "command-builder", ">= 0.2.0"
    gem "unix-whereis", ">= 0.1.0"
    gem "lookup-hash", ">= 0.2.0"
 
