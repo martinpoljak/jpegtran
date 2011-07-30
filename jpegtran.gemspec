@@ -40,14 +40,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<hash-utils>, [">= 0.18.0"])
-      s.add_runtime_dependency(%q<command-builder>, [">= 0.1.0"])
+      s.add_runtime_dependency(%q<command-builder>, [">= 0.2.0"])
       s.add_runtime_dependency(%q<unix-whereis>, [">= 0.1.0"])
       s.add_runtime_dependency(%q<lookup-hash>, [">= 0.2.0"])
       s.add_development_dependency(%q<bundler>, [">= 1.0.0"])
       s.add_development_dependency(%q<jeweler>, [">= 1.5.2"])
     else
       s.add_dependency(%q<hash-utils>, [">= 0.18.0"])
-      s.add_dependency(%q<command-builder>, [">= 0.1.0"])
+      s.add_dependency(%q<command-builder>, [">= 0.2.0"])
       s.add_dependency(%q<unix-whereis>, [">= 0.1.0"])
       s.add_dependency(%q<lookup-hash>, [">= 0.2.0"])
       s.add_dependency(%q<bundler>, [">= 1.0.0"])
@@ -55,7 +55,7 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<hash-utils>, [">= 0.18.0"])
-    s.add_dependency(%q<command-builder>, [">= 0.1.0"])
+    s.add_dependency(%q<command-builder>, [">= 0.2.0"])
     s.add_dependency(%q<unix-whereis>, [">= 0.1.0"])
     s.add_dependency(%q<lookup-hash>, [">= 0.2.0"])
     s.add_dependency(%q<bundler>, [">= 1.0.0"])
