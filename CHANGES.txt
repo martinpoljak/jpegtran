@@ -1,0 +1,10 @@
+
+0.1.2 (2011-07-30)
+* executing directly by 'command-builder'
+* switch to more modern 'hash-utils'
+
+0.1.1 (2011-02-30)
+* some subminor issues
+
+0.1.0 (2011-05-28) 
+* initial version
