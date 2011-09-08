@@ -4,7 +4,6 @@ source "http://rubygems.org"
    gem "hash-utils", ">= 0.18.0"
    gem "command-builder", ">= 0.2.0"
    gem "unix-whereis", ">= 0.1.0"
-   gem "lookup-hash", ">= 0.2.0"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

@@ -1,10 +1,10 @@
 # encoding: utf-8
 # (c) 2011 Martin Kozák (martinkozak@martinkozak.net)
 
+require "hash-utils/object"   # >= 0.18.0
 require "command-builder"     # >= 0.2.0
 require "unix/whereis"
-require "lookup-hash"
-require "hash-utils/object"   # >= 0.18.0
+require "set"
 
 ##
 # The +jpegtran+ tool command frontend.
@@ -23,7 +23,7 @@ module Jpegtran
     # Indicates turn on/off style arguments.
     #
     
-    BOOLEAN_ARGS = LookupHash[
+    BOOLEAN_ARGS = Set::new [
         :optimize, :progressive, :grayscale, :perfect, :transpose, 
         :transverse, :trim, :arithmetic
     ]
@@ -32,7 +32,7 @@ module Jpegtran
     # Holds copy values.
     #
     
-    COPY_OPTIONS = LookupHash[
+    COPY_OPTIONS = Set::new [
         :none, :comments, :all
     ]
     
@@ -40,7 +40,7 @@ module Jpegtran
     # Holds flip values.
     #
     
-    FLIP_OPTIONS = LookupHash[
+    FLIP_OPTIONS = Set::new [
         :horizontal, :vertical
     ]
     
