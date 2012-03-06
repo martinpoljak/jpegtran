@@ -22,8 +22,7 @@ Gem::Specification.new do |s|
     "README.md"
   ]
 
-  s.add_runtime_dependency 'hash-utils', '>= 1.0.0'
-  s.add_runtime_dependency 'command-builder', '>= 0.2.0'
+  s.add_runtime_dependency 'pipe-run', "~> 0.3.0"
   s.add_development_dependency 'bundler'
 end
 
