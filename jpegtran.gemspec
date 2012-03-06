@@ -24,7 +24,6 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'hash-utils', '>= 1.0.0'
   s.add_runtime_dependency 'command-builder', '>= 0.2.0'
-  s.add_runtime_dependency 'unix-whereis', '>= 0.1.0'
   s.add_development_dependency 'bundler'
 end
 
