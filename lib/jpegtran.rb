@@ -1,10 +1,7 @@
 # encoding: utf-8
 # (c) 2011 Martin Kozák (martinkozak@martinkozak.net)
 
-require "hash-utils/object"   # >= 0.18.0
-require "command-builder"     # >= 0.2.0
-require "unix/whereis"
-require "set"
+require 'pipe-run'
 
 ##
 # The +jpegtran+ tool command frontend.
@@ -16,135 +13,134 @@ module Jpegtran
     ##
     # Holds +jpegoptim+ command.
     #
-    
+
     COMMAND = :jpegtran
-    
+
     ##
     # Indicates turn on/off style arguments.
     #
-    
-    BOOLEAN_ARGS = Set::new [
-        :optimize, :progressive, :grayscale, :perfect, :transpose, 
+
+    BOOLEAN_ARGS = [
+        :optimize, :progressive, :grayscale, :perfect, :transpose,
         :transverse, :trim, :arithmetic
     ]
-    
+
     ##
     # Holds copy values.
     #
-    
-    COPY_OPTIONS = Set::new [
+
+    COPY_OPTIONS = [
         :none, :comments, :all
     ]
-    
+
     ##
     # Holds flip values.
     #
-    
-    FLIP_OPTIONS = Set::new [
+
+    FLIP_OPTIONS = [
         :horizontal, :vertical
     ]
-    
+
     ##
     # Result structure.
     #
-    # Return value contains only +:errors+ member. +:errors+ contains 
+    # Return value contains only +:errors+ member. +:errors+ contains
     # simply array of error messages.
-    # 
-    
+    #
+
     Result = Struct::new(:errors)
-    
+
     ##
     # Holds output matchers.
     #
-    
+
     ERROR = /jpegtran:\s*(.*)\s*/
 
     ##
     # Checks if +jpegtran+ is available.
     # @return [Boolean] +true+ if it is, +false+ in otherwise
     #
-    
+
     def self.available?
-        return Whereis.available? self::COMMAND 
+        self.executable != nil
     end
-    
+
     ##
-    # Performs optimizations above file. For list of arguments, see 
+    # Returns the jpegtran command executable full path
+    # @return [String] path to the jpegtran executable
+    #
+
+    def self.executable
+        path = `which #{self::COMMAND}`
+        $? == 0 ? path.chomp! : nil
+    end
+
+    ##
+    # Performs optimizations above file. For list of arguments, see
     # reference of +jpegtran+.
     #
-    # If block is given, runs +jpegoptim+ asynchronously. In that case, 
+    # If block is given, runs +jpegoptim+ asynchronously. In that case,
     # +em-pipe-run+ file must be already required.
     #
     # @param [String, Array] paths file path or array of paths for optimizing
-    # @param [Hash] options options 
+    # @param [Hash] options options
     # @param [Proc] block block for giving back the results
     # @return [Struct] see {Result}
     #
-    
+
     def self.optimize(path, options = { }, &block)
-    
+
         # Command
-        cmd = CommandBuilder::new(self::COMMAND)
-        cmd.separators = ["-", " ", "-", " "]
-        
+        cmd = [self.executable]
+
         # Turn on/off arguments
         options.each_pair do |k, v|
-            if v.true? and k.in? self::BOOLEAN_ARGS
-                cmd << k
+            if v == true and self::BOOLEAN_ARGS.include?(k)
+                cmd << "-#{k}"
             end
         end
-        
-        # Rotate
-        if options[:rotate].kind_of? Integer
-            cmd.arg(:rotate, options[:rotate].to_i)
-        elsif :rotate.in? options
-            raise Exception::new("Invalid value for :rotate option. Integer expected.")
+
+        # Integer arguments
+        [ :rotate, :restart ].each do |arg|
+            if options[arg].kind_of? Integer
+                cmd << "-#{arg} #{options[arg]}"
+            elsif options.include?(arg)
+                raise Exception::new("Invalid value for :#{arg} option. Integer expected.")
+            end
         end
-        
-        # Rotate
-        if options[:restart].kind_of? Integer
-            cmd.arg(:restart, options[:restart].to_i)
-        elsif :restart.in? options
-            raise Exception::new("Invalid value for :restart option. Integer expected.")
+
+        # String arguments
+        [ :crop, :scans ].each do |arg|
+            if options[arg].is_a?(String)
+                cmd << "-#{arg} #{options[arg]}"
+            elsif options.include?(arg)
+                raise Exception::new("Invalid value for :#{arg} option. Structured string expected. See 'jpegtran' reference.")
+            end
         end
-        
-        # Crop
-        if options[:crop].string?
-            cmd.arg(:crop, options[:crop].to_s)
-        elsif :crop.in? options
-            raise Exception::new("Invalid value for :crop option. Structured string expected. See 'jpegtran' reference.")
-        end
-        
-        # Scans
-        if options[:scans].string?
-            cmd.arg(:scans, options[:scans].to_s)
-        elsif :scans.in? options
-            raise Exception::new("Invalid value for :scans option. String expected.")
-        end
-                
+
         # Copy
-        if :copy.in? options 
+        if options.include?(:copy)
             value = options[:copy].to_sym
-            if vlaue.in? self::COPY_OPTIONS
-                cmd.arg(:copy, value)
+            if self::COPY_OPTIONS.include?(value)
+                cmd << "-copy #{value}"
             else
                 raise Exception::new("Invalid value for :copy. Expected " << self::COPY_OPTIONS.to_s)
             end
-        end 
-        
+        end
+
         # Flip
-        if :flip.in? options
+        if options.include?(:flip)
             value = options[:flip].to_sym
-            if value.in? self::FLIP_OPTIONS
-                cmd.arg(:flip, value)
+            if self::FLIP_OPTIONS.include?(value)
+                cmd << "-flip #{value}"
             else
                 raise Exception::new("Invalid value for :flip. Expected " << self::FLIP_OPTIONS.to_s)
             end
         end
-        
+
         # Outfile
-        if :outfile.in? options
-            if options[:outfile].string?
+        if options.include?(:outfile)
+            if options[:outfile].is_a?(String)
                 value = options[:outfile].to_s
             else
                 raise Exception::new("Invalid value for :outfile option. String expected.")
@@ -152,30 +148,26 @@ module Jpegtran
         else
             value = path.to_s
         end
-        
-        cmd.arg(:outfile, value)
-        
-        # Runs the command
-        cmd << path.to_s
-        
-        if options[:debug] == true
-            STDERR.write cmd.to_s + "\n"
-        end
-            
-        # Blocking
-        if block.nil?
-            cmd.execute!
 
-        # Non-blocking
+        cmd << "-outfile #{value}"
+        cmd << path.to_s
+        cmd = cmd.join(" ")
+
+        if options[:debug] == true
+            STDERR.write cmd + "\n"
+        end
+
+        if block.nil?
+            Pipe::run(cmd)
         else
-            cmd.execute do |output|
-                block.call()
+            Pipe::run(cmd) do |output|
+                block.call
             end
         end
-        
+
     end
-    
-    
+
+
     # private
     #
     ##
@@ -189,7 +181,7 @@ module Jpegtran
     #            errors << m[1]
     #        end
     #    end
-    #    
+    #
     #    return errors
     # end
 end
