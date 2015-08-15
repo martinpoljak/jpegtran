@@ -89,7 +89,7 @@ module Jpegtran
         
         # Turn on/off arguments
         options.each_pair do |k, v|
-            if v.true? and k.in? self::BOOLEAN_ARGS
+            if v.kind_of? TrueClass and self::BOOLEAN_ARGS.include? k 
                 cmd << k
             end
         end
@@ -97,35 +97,35 @@ module Jpegtran
         # Rotate
         if options[:rotate].kind_of? Integer
             cmd.arg(:rotate, options[:rotate].to_i)
-        elsif :rotate.in? options
+        elsif options.include? :rotate
             raise Exception::new("Invalid value for :rotate option. Integer expected.")
         end
         
         # Rotate
         if options[:restart].kind_of? Integer
             cmd.arg(:restart, options[:restart].to_i)
-        elsif :restart.in? options
+        elsif options.include? :restart
             raise Exception::new("Invalid value for :restart option. Integer expected.")
         end
         
         # Crop
-        if options[:crop].string?
+        if options[:crop].kind_of? String
             cmd.arg(:crop, options[:crop].to_s)
-        elsif :crop.in? options
+        elsif options.include? :crop
             raise Exception::new("Invalid value for :crop option. Structured string expected. See 'jpegtran' reference.")
         end
         
         # Scans
-        if options[:scans].string?
+        if options[:scans].kind_of? String
             cmd.arg(:scans, options[:scans].to_s)
-        elsif :scans.in? options
+        elsif options.include? :scans
             raise Exception::new("Invalid value for :scans option. String expected.")
         end
                 
         # Copy
-        if :copy.in? options 
+        if options.include? :copy 
             value = options[:copy].to_sym
-            if vlaue.in? self::COPY_OPTIONS
+            if self::COPY_OPTIONS.include? value
                 cmd.arg(:copy, value)
             else
                 raise Exception::new("Invalid value for :copy. Expected " << self::COPY_OPTIONS.to_s)
@@ -133,9 +133,9 @@ module Jpegtran
         end 
         
         # Flip
-        if :flip.in? options
+        if options.include? :flip
             value = options[:flip].to_sym
-            if value.in? self::FLIP_OPTIONS
+            if self::FLIP_OPTIONS.include? :value
                 cmd.arg(:flip, value)
             else
                 raise Exception::new("Invalid value for :flip. Expected " << self::FLIP_OPTIONS.to_s)
@@ -143,8 +143,8 @@ module Jpegtran
         end
         
         # Outfile
-        if :outfile.in? options
-            if options[:outfile].string?
+        if options.include? :outfile
+            if options[:outfile].kind_of? String
                 value = options[:outfile].to_s
             else
                 raise Exception::new("Invalid value for :outfile option. String expected.")

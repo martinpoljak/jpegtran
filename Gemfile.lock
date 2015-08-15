@@ -60,7 +60,6 @@ PLATFORMS
 DEPENDENCIES
   bundler (>= 1.0.0)
   command-builder (>= 0.2.0)
-  hash-utils (>= 0.18.0)
   jeweler (>= 1.5.2)
   unix-whereis (>= 0.1.0)
 
